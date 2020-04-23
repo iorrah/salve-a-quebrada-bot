@@ -85,7 +85,7 @@ function actuallyPushItemsToDB(items, file) {
       console.log('>> Target already contains ' + obj.stores.length + ' items');
       
       items.forEach(function addItemToStoresArray(item) {
-        obj.stores.push(item);
+        obj.stores.push(generateStoreObject(item));
       });
 
       json = JSON.stringify(obj);
@@ -100,3 +100,36 @@ function actuallyPushItemsToDB(items, file) {
     }
   });
 }
+
+function generateStoreObject(item) {
+  var addressList = item.location.display_address;
+  var address = "";
+
+  addressList.forEach(function getAddressLine(addressLine) {
+    if (addressLine !== '' && addressLine !== 'Brazil') {
+      address += ' ' + addressLine;
+    }
+  });
+
+  address = address.trim();
+
+  return {
+    address: address,
+    donation: item.url,
+    id: item.id,
+    image: item.image_url,
+    name: capitalize(item.name),
+    status: 1,
+  };
+}
+
+function capitalize(str, lower = false) {
+  return (lower ? str.toLowerCase() : str)
+    .replace(/(?:^|\s|["'([{])+\S/g, function(match) {
+      if (match.length >= 3) {
+        return match.toUpperCase();
+      }
+
+      return match;
+    });
+};
