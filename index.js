@@ -53,6 +53,30 @@ readFiles(folder)
 function pushItemsToDB(items) {
   var file = 'db.json';
 
+  if (fs.existsSync(file)) {
+    console.log('>> File "' + file + '" already exists');
+    actuallyPushItemsToDB(items, file);
+  } else {
+    var json = {
+      stores: [],
+    };
+
+    var stringJSON = JSON.stringify(json);
+
+    fs.writeFile(file, stringJSON, (err) => {
+      if (err) {
+        console.log('>> Error', err);
+      } else {
+        console.log('>> File "' + file + '" created');
+        actuallyPushItemsToDB(items, file);
+      }
+    });
+  }
+}
+
+function actuallyPushItemsToDB(items, file) {
+  var file = 'db.json';
+
   fs.readFile(file, 'utf-8', function readFileCallback(err, data){
     if (err) {
         console.log(err);
@@ -70,6 +94,7 @@ function pushItemsToDB(items) {
           console.log(err);
         } else {
           console.log('>> Successfully added ' + items.length + ' items');
+          console.log('>> Target now contains ' + (items.length + obj.stores.length) + ' items');
         }
       });
     }
