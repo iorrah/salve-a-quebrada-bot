@@ -14,39 +14,43 @@ function promiseAllP(items, block) {
 }
 
 function readFiles(dirname) {
-    return new Promise((resolve, reject) => {
-        fs.readdir(dirname, function(err, filenames) {
-            if (err) return reject(err);
-            promiseAllP(filenames,
-            (filename,index,resolve,reject) =>  {
-                fs.readFile(path.resolve(dirname, filename), 'utf-8', function(err, content) {
-                    if (err) return reject(err);
-                    return resolve({filename: filename, contents: content});
-                });
-            })
-            .then(results => {
-                return resolve(results);
-            })
-            .catch(error => {
-                return reject(error);
-            });
+  return new Promise((resolve, reject) => {
+    fs.readdir(dirname, function(err, filenames) {
+      if (err) return reject(err);
+      _filenames = filenames.filter(filename => !(/(^|\/)\.[^\/\.]/g).test(filename));
+
+      promiseAllP(_filenames, (filename, index, resolve, reject) => {
+        fs.readFile(path.resolve(dirname, filename), 'utf-8', function(err, content) {
+          if (err) return reject(err);
+          return resolve({filename: filename, contents: content});
         });
+      })
+      .then(results => {
+          return resolve(results);
+      })
+      .catch(error => {
+          return reject(error);
+      });
+    });
   });
 }
 
-var folder = 'data';
+var folder = 'data-test';
 
 readFiles(folder)
 .then(files => {
     console.log('>> Loaded ' + files.length + ' files');
     
-    files.forEach( (item, index) => {
-      var content = JSON.parse(item.contents);
-      var items = content.businesses;
-      pushItemsToDB(items);
+    files.forEach((item, index) => {
+      if (index < 10) {
+        console.log('>> Now reading "' + item.filename + '"...');
+        var content = JSON.parse(item.contents);
+        var items = content.businesses;
+        pushItemsToDB(items);
+      }
     });
 })
-.catch( error => {
+.catch(error => {
     console.log( error );
 });
 
