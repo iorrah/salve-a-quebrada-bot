@@ -2,9 +2,11 @@ var fs = require('fs');
 var path = require('path');
 
 var PATH_TARGET = 'db.json';
-var PATH_SOURCE = 'data-test';
+var PATH_SOURCE = 'data';
+var totalAmountStores = 0;
 
-function consoleLog(string) {
+function consoleLog(string, withSeparator) {
+  if (withSeparator) console.log('----------');
   console.log('>> ' + string);
 }
 
@@ -51,13 +53,14 @@ function readFiles(dirname) {
 
 function deleteTargetFile() {
   if (fs.existsSync(PATH_TARGET)) {
-    fs.unlinkSync(PATH_TARGET, function(err) {
-      if (err) {
-        consoleError(err);
-      }
-
-      consoleLog('The file ' + PATH_TARGET + ' has been deleted');
-    });
+    try {
+      fs.unlinkSync(PATH_TARGET);
+      consoleLog('The file "' + PATH_TARGET + '" has been deleted');
+    } catch(err) {
+      consoleError(err);
+    }
+  } else {
+    consoleLog('Could not find the "' + PATH_TARGET + '" file');
   }
 }
 
@@ -73,8 +76,8 @@ readFiles(PATH_SOURCE)
   deleteTargetFile();
 
   files.forEach((item, index) => {
-    if (index < 10) {
-      consoleLog('Now reading "' + item.filename + '"...');
+    if (index <= 1) {
+      consoleLog('Now reading the file "' + item.filename + '"', true);
       var content = JSON.parse(item.contents);
       var items = content.businesses;
       pushItemsToDB(items);
@@ -92,24 +95,21 @@ function pushItemsToDB(items) {
     consoleLog('File "' + PATH_TARGET + '" already exists');
     actuallyPushItemsToDB(items);
   } else {
-    var json = {
-      stores: [],
-    };
-
+    consoleLog('Creating new "' + PATH_TARGET + '" file');
+    var json = { stores: [] };
     var stringJSON = JSON.stringify(json);
 
-    fs.writeFile(PATH_TARGET, stringJSON, (err) => {
-      if (err) {
-        consoleLog('Error', err);
-      } else {
-        consoleLog('File "' + PATH_TARGET + '" created');
-        actuallyPushItemsToDB(items);
-      }
-    });
+    try {
+      fs.writeFileSync(PATH_TARGET, stringJSON);
+      consoleLog('File "' + PATH_TARGET + '" created');
+      actuallyPushItemsToDB(items);
+    } catch(err) {   
+      consoleError(err);
+    };
   }
 }
 
-function actuallyPushItemsToDB(items) {
+function actuallyPushItemsToDB(stores) {
   fs.readFile(PATH_TARGET, 'utf-8', function readFileCallback(err, data){
     if (err) {
         consoleLog(err);
@@ -125,10 +125,10 @@ function actuallyPushItemsToDB(items) {
         return;
       }
 
-      consoleLog('Target already contains ' + obj.stores.length + ' items');
+      consoleLog('Target already contains ' + obj.stores.length + ' stores', true);
 
-      items.forEach(function addItemToStoresArray(item) {
-        obj.stores.push(generateStoreObject(item));
+      stores.forEach(function addItemToStoresArray(store) {
+        obj.stores.push(generateStoreObject(store));
       });
 
       try {
@@ -137,14 +137,14 @@ function actuallyPushItemsToDB(items) {
         consoleError(err);
       }
 
-      fs.writeFile(PATH_TARGET, json, 'utf-8', function succeddfullyWritten(err) {
-        if (err) {
-          consoleLog(err);
-        } else {
-          consoleLog('Successfully added ' + items.length + ' items');
-          consoleLog('Target now contains ' + (items.length + obj.stores.length) + ' items');
-        }
-      });
+      try {
+        fs.writeFileSync(PATH_TARGET, json, 'utf-8');
+        consoleLog('Successfully added ' + stores.length + ' stores');
+        totalAmountStores += stores.length;
+        consoleLog('Total amount of stores: ' + totalAmountStores);
+      } catch(err) {
+        consoleError(err);
+      }
     }
   });
 }
