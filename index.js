@@ -75,13 +75,11 @@ readFiles(PATH_SOURCE)
 
   deleteTargetFile();
 
-  files.forEach((item, index) => {
-    if (index <= 1) {
-      consoleLog('Now reading the file "' + item.filename + '"', true);
-      var content = JSON.parse(item.contents);
-      var items = content.businesses;
-      pushItemsToDB(items);
-    }
+  files.forEach((item) => {
+    consoleLog('Now reading the file "' + item.filename + '"', true);
+    var content = JSON.parse(item.contents);
+    var items = content.businesses;
+    pushItemsToDB(items);
   });
 })
 .catch(error => {
