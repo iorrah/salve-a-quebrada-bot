@@ -1,11 +1,15 @@
 var fs = require('fs');
 var path = require('path');
 
+var PATH_TARGET = 'db.json';
+var PATH_SOURCE = 'data-test';
+
 function consoleLog(string) {
   console.log('>> ' + string);
 }
 
 function consoleError(string) {
+  consoleLog('Error!');
   console.log(string);
 }
 
@@ -45,12 +49,29 @@ function readFiles(dirname) {
   });
 }
 
-var folder = 'data-test';
+function deleteTargetFile() {
+  if (fs.existsSync(PATH_TARGET)) {
+    fs.unlinkSync(PATH_TARGET, function(err) {
+      if (err) {
+        consoleError(err);
+      }
 
-readFiles(folder)
+      consoleLog('The file ' + PATH_TARGET + ' has been deleted');
+    });
+  }
+}
+
+readFiles(PATH_SOURCE)
 .then(files => {
   consoleLog('Loaded ' + files.length + ' files');
   
+  if (!(files.length > 0)) {
+    consoleError('Not enough files');
+    return;
+  }
+
+  deleteTargetFile();
+
   files.forEach((item, index) => {
     if (index < 10) {
       consoleLog('Now reading "' + item.filename + '"...');
@@ -65,11 +86,11 @@ readFiles(folder)
 });
 
 function pushItemsToDB(items) {
-  var file = 'db.json';
+  consoleLog('Will push "' + items.length + '" items...');
 
-  if (fs.existsSync(file)) {
-    consoleLog('File "' + file + '" already exists');
-    actuallyPushItemsToDB(items, file);
+  if (fs.existsSync(PATH_TARGET)) {
+    consoleLog('File "' + PATH_TARGET + '" already exists');
+    actuallyPushItemsToDB(items);
   } else {
     var json = {
       stores: [],
@@ -77,44 +98,46 @@ function pushItemsToDB(items) {
 
     var stringJSON = JSON.stringify(json);
 
-    fs.writeFile(file, stringJSON, (err) => {
+    fs.writeFile(PATH_TARGET, stringJSON, (err) => {
       if (err) {
         consoleLog('Error', err);
       } else {
-        consoleLog('File "' + file + '" created');
-        actuallyPushItemsToDB(items, file);
+        consoleLog('File "' + PATH_TARGET + '" created');
+        actuallyPushItemsToDB(items);
       }
     });
   }
 }
 
-function actuallyPushItemsToDB(items, file) {
-  var file = 'db.json';
-
-  fs.readFile(file, 'utf-8', function readFileCallback(err, data){
+function actuallyPushItemsToDB(items) {
+  fs.readFile(PATH_TARGET, 'utf-8', function readFileCallback(err, data){
     if (err) {
         consoleLog(err);
     } else {
-
       try {
         var obj = JSON.parse(data);
-      }
-      catch(err) {
+      } catch(err) {
         consoleError(err);
+        consoleError(data);
       }
 
-      if (!(obj && obj.stores && obj.stores.length)) {
+      if (!(obj && obj.stores)) {
         return;
       }
 
       consoleLog('Target already contains ' + obj.stores.length + ' items');
-      
+
       items.forEach(function addItemToStoresArray(item) {
         obj.stores.push(generateStoreObject(item));
       });
 
-      json = JSON.stringify(obj);
-      fs.writeFile(file, json, 'utf-8', function succeddfullyWritten(err) {
+      try {
+        var json = JSON.stringify(obj);
+      } catch(err) {
+        consoleError(err);
+      }
+
+      fs.writeFile(PATH_TARGET, json, 'utf-8', function succeddfullyWritten(err) {
         if (err) {
           consoleLog(err);
         } else {
