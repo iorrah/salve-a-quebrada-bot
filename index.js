@@ -110,43 +110,43 @@ function pushItemsToDB(items) {
 }
 
 function actuallyPushItemsToDB(stores) {
-  fs.readFile(PATH_TARGET, 'utf-8', function readFileCallback(err, data){
-    if (err) {
-        consoleLog(err);
-    } else {
-      try {
-        var obj = JSON.parse(data);
-      } catch(err) {
-        consoleError(err);
-        consoleError(data);
-      }
+  try {
+    var data = fs.readFileSync(PATH_TARGET, 'utf-8');
 
-      if (!(obj && obj.stores)) {
-        return;
-      }
-
-      consoleLog('Target already contains ' + obj.stores.length + ' stores', true);
-
-      stores.forEach(function addItemToStoresArray(store) {
-        obj.stores.push(generateStoreObject(store));
-      });
-
-      try {
-        var json = JSON.stringify(obj);
-      } catch(err) {
-        consoleError(err);
-      }
-
-      try {
-        fs.writeFileSync(PATH_TARGET, json, 'utf-8');
-        consoleLog('Successfully added ' + stores.length + ' stores');
-        totalAmountStores += stores.length;
-        consoleLog('Total amount of stores: ' + totalAmountStores);
-      } catch(err) {
-        consoleError(err);
-      }
+    try {
+      var obj = JSON.parse(data);
+    } catch(err) {
+      consoleError(err);
+      consoleError(data);
     }
-  });
+
+    if (!(obj && obj.stores)) {
+      return;
+    }
+
+    consoleLog('Target already contains ' + obj.stores.length + ' stores', true);
+
+    stores.forEach(function addItemToStoresArray(store) {
+      obj.stores.push(generateStoreObject(store));
+    });
+
+    try {
+      var json = JSON.stringify(obj);
+    } catch(err) {
+      consoleError(err);
+    }
+
+    try {
+      fs.writeFileSync(PATH_TARGET, json, 'utf-8');
+      consoleLog('Successfully added ' + stores.length + ' stores');
+      totalAmountStores += stores.length;
+      consoleLog('Total amount of stores: ' + totalAmountStores);
+    } catch(err) {
+      consoleError(err);
+    }
+  } catch(err) {
+    consoleError(err);
+  }
 }
 
 function generateStoreObject(item) {
