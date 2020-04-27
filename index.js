@@ -5,6 +5,10 @@ function consoleLog(string) {
   console.log('>> ' + string);
 }
 
+function consoleError(string) {
+  console.log(string);
+}
+
 function promiseAllP(items, block) {
   var promises = [];
   
@@ -91,7 +95,18 @@ function actuallyPushItemsToDB(items, file) {
     if (err) {
         consoleLog(err);
     } else {
-      obj = JSON.parse(data);
+
+      try {
+        var obj = JSON.parse(data);
+      }
+      catch(err) {
+        consoleError(err);
+      }
+
+      if (!(obj && obj.stores && obj.stores.length)) {
+        return;
+      }
+
       consoleLog('Target already contains ' + obj.stores.length + ' items');
       
       items.forEach(function addItemToStoresArray(item) {
