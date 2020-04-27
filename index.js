@@ -1,16 +1,22 @@
 var fs = require('fs');
 var path = require('path');
 
+function consoleLog(string) {
+  console.log('>> ' + string);
+}
+
 function promiseAllP(items, block) {
-    var promises = [];
-    items.forEach(function(item,index) {
-        promises.push( function(item,i) {
-            return new Promise(function(resolve, reject) {
-                return block.apply(this,[item,index,resolve,reject]);
-            });
-        }(item,index))
-    });
-    return Promise.all(promises);
+  var promises = [];
+  
+  items.forEach(function(item, index) {
+    promises.push( function(item, i) {
+      return new Promise(function(resolve, reject) {
+        return block.apply(this,[item,index,resolve,reject]);
+      });
+    }(item,index))
+  });
+
+  return Promise.all(promises);
 }
 
 function readFiles(dirname) {
@@ -22,7 +28,7 @@ function readFiles(dirname) {
       promiseAllP(_filenames, (filename, index, resolve, reject) => {
         fs.readFile(path.resolve(dirname, filename), 'utf-8', function(err, content) {
           if (err) return reject(err);
-          return resolve({filename: filename, contents: content});
+          return resolve({ filename: filename, contents: content });
         });
       })
       .then(results => {
@@ -39,26 +45,26 @@ var folder = 'data-test';
 
 readFiles(folder)
 .then(files => {
-    console.log('>> Loaded ' + files.length + ' files');
-    
-    files.forEach((item, index) => {
-      if (index < 10) {
-        console.log('>> Now reading "' + item.filename + '"...');
-        var content = JSON.parse(item.contents);
-        var items = content.businesses;
-        pushItemsToDB(items);
-      }
-    });
+  consoleLog('Loaded ' + files.length + ' files');
+  
+  files.forEach((item, index) => {
+    if (index < 10) {
+      consoleLog('Now reading "' + item.filename + '"...');
+      var content = JSON.parse(item.contents);
+      var items = content.businesses;
+      pushItemsToDB(items);
+    }
+  });
 })
 .catch(error => {
-    console.log( error );
+  consoleLog(error);
 });
 
 function pushItemsToDB(items) {
   var file = 'db.json';
 
   if (fs.existsSync(file)) {
-    console.log('>> File "' + file + '" already exists');
+    consoleLog('File "' + file + '" already exists');
     actuallyPushItemsToDB(items, file);
   } else {
     var json = {
@@ -69,9 +75,9 @@ function pushItemsToDB(items) {
 
     fs.writeFile(file, stringJSON, (err) => {
       if (err) {
-        console.log('>> Error', err);
+        consoleLog('Error', err);
       } else {
-        console.log('>> File "' + file + '" created');
+        consoleLog('File "' + file + '" created');
         actuallyPushItemsToDB(items, file);
       }
     });
@@ -83,10 +89,10 @@ function actuallyPushItemsToDB(items, file) {
 
   fs.readFile(file, 'utf-8', function readFileCallback(err, data){
     if (err) {
-        console.log(err);
+        consoleLog(err);
     } else {
       obj = JSON.parse(data);
-      console.log('>> Target already contains ' + obj.stores.length + ' items');
+      consoleLog('Target already contains ' + obj.stores.length + ' items');
       
       items.forEach(function addItemToStoresArray(item) {
         obj.stores.push(generateStoreObject(item));
@@ -95,10 +101,10 @@ function actuallyPushItemsToDB(items, file) {
       json = JSON.stringify(obj);
       fs.writeFile(file, json, 'utf-8', function succeddfullyWritten(err) {
         if (err) {
-          console.log(err);
+          consoleLog(err);
         } else {
-          console.log('>> Successfully added ' + items.length + ' items');
-          console.log('>> Target now contains ' + (items.length + obj.stores.length) + ' items');
+          consoleLog('Successfully added ' + items.length + ' items');
+          consoleLog('Target now contains ' + (items.length + obj.stores.length) + ' items');
         }
       });
     }
@@ -107,7 +113,7 @@ function actuallyPushItemsToDB(items, file) {
 
 function generateStoreObject(item) {
   var addressList = item.location.display_address;
-  var address = "";
+  var address = '';
 
   addressList.forEach(function getAddressLine(addressLine) {
     if (addressLine !== '' && addressLine !== 'Brazil') {
