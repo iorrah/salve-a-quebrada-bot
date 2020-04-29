@@ -3,13 +3,66 @@ var path = require('path');
 
 var PATH_TARGET = 'db.json';
 
-function filterImage(array) {
+var chainVenues = [
+  "bob's",
+  "bobs",
+  "mcdonald",
+  "mc donald",
+  "mc donalds",
+  "mcdonalds",
+  "mcdonald's",
+  "burger king",
+  "burgerking",
+  "habbibs",
+  "habibs",
+  "habib",
+  "habib's",
+  "giraffas",
+  "girafas",
+  "kfc",
+  "star bucks",
+  "starbucks",
+  "starbuck",
+  "pizza hut",
+  "pizzahut",
+  "ragazzo",
+  "outback",
+  "outback steakhouse",
+  "subway",
+  "bigxpicanha",
+  "big x picanha",
+  "frango frito",
+  "divino fogão",
+  "divino fogão",
+  "china in box",
+  "taco bell",
+  "wendy's",
+  "wendys",
+  "popeyes",
+  "dunkin' donuts",
+  "dunkin donuts",
+  "domino",
+  "dominos",
+  "domino's",
+];
+
+function filterByImage(array) {
   return array.filter((item) => {
     if (item.image !== '') {
       return true;
     }
 
     return false;
+  });
+}
+
+function filterByChainVenue(array) {
+  return array.filter((item) => {
+    if (chainVenues.indexOf(item.name.toLowerCase()) >= 0) {
+      return false;
+    }
+
+    return true;
   });
 }
 
@@ -30,7 +83,8 @@ function filterUniqId(arr) {
 
 function filter(array) {
   var filtered = array;
-  filtered = filterImage(filtered);
+  filtered = filterByImage(filtered);
+  filtered = filterByChainVenue(filtered);
   filtered = filterUniqId(filtered);
   return filtered;
 }
