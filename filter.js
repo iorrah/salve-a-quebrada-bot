@@ -51,6 +51,7 @@ var keyword = [
   "praia do leme",
   "restaurante central",
   "complex",
+  "ofner",
 ];
 
 function consoleLog(string, withSeparator) {
