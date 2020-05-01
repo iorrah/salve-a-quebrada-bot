@@ -4,7 +4,7 @@ var path = require('path');
 var PATH_TARGET = 'db.json';
 var PATH_API = '../salve-a-quebrada-api/';
 
-var chainVenues = [
+var keyword = [
   "bob's",
   "bobs",
   "mcdonald",
@@ -46,6 +46,11 @@ var chainVenues = [
   "dominos",
   "domino's",
   "mister pizza",
+  "restaurante e casa de forro cariri",
+  "ataliba churrascaria",
+  "praia do leme",
+  "restaurante central",
+  "complex",
 ];
 
 function consoleLog(string, withSeparator) {
@@ -77,9 +82,9 @@ function filterByImage(array) {
   });
 }
 
-function filterByChainVenue(array) {
+function filterByKeyword(array) {
   return array.filter((item) => {
-    if (chainVenues.indexOf(item.name.toLowerCase()) >= 0) {
+    if (keyword.indexOf(item.name.toLowerCase()) >= 0) {
       return false;
     }
 
@@ -105,7 +110,7 @@ function filterUniqId(arr) {
 function filter(array) {
   var filtered = array;
   filtered = filterByImage(filtered);
-  filtered = filterByChainVenue(filtered);
+  filtered = filterByKeyword(filtered);
   filtered = filterUniqId(filtered);
   return filtered;
 }
