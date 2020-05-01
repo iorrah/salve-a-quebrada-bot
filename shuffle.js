@@ -3,6 +3,25 @@ var path = require('path');
 
 var PATH_TARGET = 'db.json';
 
+function consoleLog(string, withSeparator) {
+  if (withSeparator) console.log('----------');
+  console.log('>> ' + string);
+}
+
+function consoleError(string) {
+  consoleLog('Error!');
+  console.log(string);
+}
+
+function moveOutputToAPI() {
+  try {
+    fs.renameSync(PATH_TARGET, PATH_API + PATH_TARGET);
+    consoleLog('File moved to API folder');
+  } catch(err) {
+    consoleError(err);
+  }
+}
+
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -43,6 +62,7 @@ function startShuffle() {
 
     try {
       fs.writeFileSync(PATH_TARGET, stringShuffledJSON);
+      moveOutputToAPI();
       console.log('Shuffling is complete');
     } catch(err) {   
       console.log(err);
