@@ -40,22 +40,22 @@ function shuffle(array) {
 }
 
 function startShuffle() {
-  console.log('Starting shuffling');
+  consoleLog('Starting shuffling');
 
   try {
     var stringJSON = fs.readFileSync(PATH_TARGET, 'utf-8');
   } catch(err) {
-    console.log(err);
+    consoleLog(err);
   }
 
   var listJSON = JSON.parse(stringJSON);
 
   if (!listJSON.stores.length) {
-    console.log('Array is empty');
+    consoleLog('Array is empty');
     return;
   }
 
-  console.log('Target has ' + listJSON.stores.length + ' items');
+  consoleLog('Target has ' + listJSON.stores.length + ' items');
   var shuffledItems = shuffle(listJSON.stores);
   var shuffledJSON = { stores: shuffledItems };
 
@@ -65,9 +65,9 @@ function startShuffle() {
     try {
       fs.writeFileSync(PATH_TARGET, stringShuffledJSON);
       moveOutputToAPI();
-      console.log('Shuffling is complete');
+      consoleLog('Shuffling is complete');
     } catch(err) {   
-      console.log(err);
+      consoleLog(err);
     };
   }
 }
