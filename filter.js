@@ -44,7 +44,27 @@ var chainVenues = [
   "domino",
   "dominos",
   "domino's",
+  "mister pizza",
 ];
+
+function consoleLog(string, withSeparator) {
+  if (withSeparator) console.log('----------');
+  console.log('>> ' + string);
+}
+
+function consoleError(string) {
+  consoleLog('Error!');
+  console.log(string);
+}
+
+function moveOutputToAPI() {
+  try {
+    fs.renameSync(PATH_TARGET, PATH_API + PATH_TARGET);
+    consoleLog('File moved to API folder');
+  } catch(err) {
+    consoleError(err);
+  }
+}
 
 function filterByImage(array) {
   return array.filter((item) => {
@@ -107,7 +127,6 @@ function startFilter() {
 
   console.log('Target has ' + listJSON.stores.length + ' items');
   var filteredItems = filter(listJSON.stores);
-
   var filteredJSON = { stores: filteredItems };
 
   if (fs.existsSync(PATH_TARGET)) {
@@ -115,6 +134,7 @@ function startFilter() {
 
     try {
       fs.writeFileSync(PATH_TARGET, stringFilteredJSON);
+      // moveOutputToAPI();
       console.log('Target now has ' + filteredItems.length + ' items');
     } catch(err) {   
       console.log(err);
