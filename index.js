@@ -147,6 +147,42 @@ function actuallyPushItemsToDB(stores) {
   }
 }
 
+function getIsValidHref(href) {
+  if (href === '' || href === undefined || href.length <= 3) {
+    return false;
+  }
+
+  if (href.indexOf('http') === -1) {
+    return false;
+  }
+
+  if (href.indexOf('.') === -1) {
+    return false;
+  }
+
+  return true;
+}
+
+function getValidHref(href) {
+  return 'http://' + href;
+}
+
+function getDonationUrl(item) {
+  var href = item.website;
+
+  if (getIsValidHref(href)) {
+    return href;
+  } else {
+    var validHref = getValidHref(href);
+
+    if (getIsValidHref(validHref)) {
+      return validHref;
+    }
+  }
+
+  return item.url;
+}
+
 function generateStoreObject(item) {
   var addressList = item.location.display_address;
   var address = '';
@@ -161,7 +197,7 @@ function generateStoreObject(item) {
 
   return {
     address: address,
-    donation: item.url,
+    donation: getDonationUrl(item),
     id: item.id,
     image: item.image_url,
     name: capitalize(item.name),
