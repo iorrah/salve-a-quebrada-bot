@@ -140,16 +140,19 @@ function actuallyPushItemsToDB(stores) {
       consoleLog('Successfully added ' + stores.length + ' stores');
       totalAmountStores += stores.length;
       consoleLog('Total amount of stores: ' + totalAmountStores);
-
-      try {
-        fs.renameSync(PATH_TARGET, PATH_API + PATH_TARGET);
-        consoleLog('File moved to API folder');
-      } catch(err) {
-        consoleError(err);
-      }
+      moveOutputToAPI();
     } catch(err) {
       consoleError(err);
     }
+  } catch(err) {
+    consoleError(err);
+  }
+}
+
+function moveOutputToAPI() {
+  try {
+    fs.renameSync(PATH_TARGET, PATH_API + PATH_TARGET);
+    consoleLog('File moved to API folder');
   } catch(err) {
     consoleError(err);
   }
