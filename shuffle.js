@@ -3,6 +3,7 @@ var path = require('path');
 
 var PATH_TARGET = 'db.json';
 var PATH_API = '../salve-a-quebrada-api/';
+var PATH_API_TARGET = PATH_API + PATH_TARGET;
 
 function consoleLog(string, withSeparator) {
   if (withSeparator) console.log('----------');
@@ -16,8 +17,8 @@ function consoleError(string) {
 
 function moveOutputToAPI() {
   try {
-    fs.renameSync(PATH_TARGET, PATH_API + PATH_TARGET);
-    consoleLog('File moved to API folder');
+    fs.copyFileSync(PATH_TARGET, PATH_API_TARGET);
+    consoleLog('Copy of file created within API folder');
   } catch(err) {
     consoleError(err);
   }
