@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 
 var PATH_TARGET = 'db.json';
+var PATH_API = '../salve-a-quebrada-api/';
 
 var chainVenues = [
   "bob's",
