@@ -3,6 +3,7 @@ var path = require('path');
 
 var PATH_TARGET = 'db.json';
 var PATH_SOURCE = 'data';
+var PATH_API = '../salve-a-quebrada-api/';
 var totalAmountStores = 0;
 
 function consoleLog(string, withSeparator) {
@@ -139,6 +140,13 @@ function actuallyPushItemsToDB(stores) {
       consoleLog('Successfully added ' + stores.length + ' stores');
       totalAmountStores += stores.length;
       consoleLog('Total amount of stores: ' + totalAmountStores);
+
+      try {
+        fs.renameSync(PATH_TARGET, PATH_API + PATH_TARGET);
+        consoleLog('File moved to API folder');
+      } catch(err) {
+        consoleError(err);
+      }
     } catch(err) {
       consoleError(err);
     }
