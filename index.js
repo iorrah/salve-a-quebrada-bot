@@ -140,7 +140,7 @@ function actuallyPushItemsToDB(stores) {
       consoleLog('Successfully added ' + stores.length + ' stores');
       totalAmountStores += stores.length;
       consoleLog('Total amount of stores: ' + totalAmountStores);
-      moveOutputToAPI();
+      // moveOutputToAPI();
     } catch(err) {
       consoleError(err);
     }
